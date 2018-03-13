@@ -15,10 +15,12 @@ public class Driver {
 
     private long mergesortRuntime;
     private long selectionRuntime;
-    private int median;
+    private int mergesortMedian;
+    private int selectionMedian;
 
-    protected SimulationResult(int median, long numInversionsBefore, long numInversionsAfter, long mergesortRuntime, long selectionRuntime) {
-      this.median = median;
+    protected SimulationResult(int selectionMedian, int mergesortMedian, long numInversionsBefore, long numInversionsAfter, long mergesortRuntime, long selectionRuntime) {
+      this.selectionMedian = selectionMedian;
+      this.mergesortMedian = mergesortMedian;
       this.numInversionsBefore = numInversionsBefore;
       this.numInversionsAfter = numInversionsAfter;
       this.mergesortRuntime = mergesortRuntime;
@@ -27,8 +29,8 @@ public class Driver {
 
     @Override
     public String toString() {
-      return String.format("Median: %d\nMergesort runtime: %d ns\nSelection runtime: %d ns\nInversion ratio: %d\n",
-          median, mergesortRuntime, selectionRuntime, numInversionsBefore);
+      return String.format("Selection median: %d\nMergesort Median: %d\nMergesort runtime: %d ns\nSelection runtime: %d ns\nInversion ratio: %d\n",
+           selectionMedian, mergesortMedian, mergesortRuntime, selectionRuntime, numInversionsBefore/numInversionsAfter);
     }
 
   }
@@ -47,14 +49,14 @@ public class Driver {
 
       // the merge sort will simultaneously calculate the number of inversions
       long numInversionsBefore = Mergesort.mergesort(dataClone, 0, data.length - 1);
-      int median = dataClone[data.length/2];
+      int mergesortMedian = dataClone[(data.length/2) - 1];
 
       // end tracking runtime of mergesort
       final long mergesortRunTime = System.nanoTime() - mergesortStartTime;
 
       // find the median with selection/partition
       final long selectionStartTime = System.nanoTime();
-      SelectionPartition.findLowerMedian(data);
+      int selectionMedian = SelectionPartition.findLowerMedian(data);
 
       // calculate time to complete selection
       final long selectionRuntime = System.nanoTime() - selectionStartTime;
@@ -64,7 +66,7 @@ public class Driver {
       long numInversionsAfter = Mergesort.mergesort(data, 0 , data.length - 1 );
 
       // store the result
-      results.add(new SimulationResult(median, numInversionsBefore, numInversionsAfter, mergesortRunTime, selectionRuntime));
+      results.add(new SimulationResult(selectionMedian, mergesortMedian, numInversionsBefore, numInversionsAfter, mergesortRunTime, selectionRuntime));
     }
 
     for(SimulationResult simResult : results) {
