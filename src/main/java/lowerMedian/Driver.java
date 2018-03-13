@@ -15,8 +15,10 @@ public class Driver {
 
     private long mergesortRuntime;
     private long selectionRuntime;
+    private int median;
 
-    protected SimulationResult(long numInversionsBefore, long numInversionsAfter, long mergesortRuntime, long selectionRuntime) {
+    protected SimulationResult(int median, long numInversionsBefore, long numInversionsAfter, long mergesortRuntime, long selectionRuntime) {
+      this.median = median;
       this.numInversionsBefore = numInversionsBefore;
       this.numInversionsAfter = numInversionsAfter;
       this.mergesortRuntime = mergesortRuntime;
@@ -25,8 +27,8 @@ public class Driver {
 
     @Override
     public String toString() {
-      return String.format("Mergesort runtime: %d ns\nSelection runtime: %d ns\nInversion ratio: %d\n",
-          mergesortRuntime, selectionRuntime, numInversionsBefore);
+      return String.format("Median: %d\nMergesort runtime: %d ns\nSelection runtime: %d ns\nInversion ratio: %d\n",
+          median, mergesortRuntime, selectionRuntime, numInversionsBefore);
     }
 
   }
@@ -38,12 +40,14 @@ public class Driver {
     // loop through simulation with different data sizes
     for(int i = 100; i <= 100000; i = i*10) {
       final int[] data = DataUtils.generateData(i, 1000000);
+      final int[] dataClone = data.clone();
 
       // begin tracking runtime of mergesort
       final long mergesortStartTime = System.nanoTime();
 
       // the merge sort will simultaneously calculate the number of inversions
-      long numInversionsBefore = Mergesort.mergesort(data.clone(), 0, data.length - 1);
+      long numInversionsBefore = Mergesort.mergesort(dataClone, 0, data.length - 1);
+      int median = dataClone[data.length/2];
 
       // end tracking runtime of mergesort
       final long mergesortRunTime = System.nanoTime() - mergesortStartTime;
@@ -60,7 +64,7 @@ public class Driver {
       long numInversionsAfter = Mergesort.mergesort(data, 0 , data.length - 1 );
 
       // store the result
-      results.add(new SimulationResult(numInversionsBefore, numInversionsAfter, mergesortRunTime, selectionRuntime));
+      results.add(new SimulationResult(median, numInversionsBefore, numInversionsAfter, mergesortRunTime, selectionRuntime));
     }
 
     for(SimulationResult simResult : results) {
