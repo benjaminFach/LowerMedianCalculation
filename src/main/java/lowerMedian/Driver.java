@@ -7,40 +7,48 @@ public class Driver {
 
   private static class SimulationResult {
 
-    /** the number of inversions in the input array before running selection/partition **/
+    /**
+     * the number of inversions in the input array before running selection/partition
+     **/
     private long numInversionsBefore;
 
-    /** the number of inversions in the input array after running selection/partition **/
+    /**
+     * the number of inversions in the input array after running selection/partition
+     **/
     private long numInversionsAfter;
 
-    private long mergesortRuntime;
     private long selectionRuntime;
-    private int mergesortMedian;
+    private long mergesortRuntime;
     private int selectionMedian;
+    private int mergesortMedian;
 
-    protected SimulationResult(int selectionMedian, int mergesortMedian, long numInversionsBefore, long numInversionsAfter, long mergesortRuntime, long selectionRuntime) {
+    protected SimulationResult(int selectionMedian, int mergesortMedian, long selectionRuntime,
+        long mergesortRuntime, long numInversionsBefore, long numInversionsAfter) {
       this.selectionMedian = selectionMedian;
       this.mergesortMedian = mergesortMedian;
+      this.selectionRuntime = selectionRuntime;
+      this.mergesortRuntime = mergesortRuntime;
       this.numInversionsBefore = numInversionsBefore;
       this.numInversionsAfter = numInversionsAfter;
-      this.mergesortRuntime = mergesortRuntime;
-      this.selectionRuntime = selectionRuntime;
     }
 
     @Override
     public String toString() {
-      return String.format("Selection median: %d\nMergesort Median: %d\nMergesort runtime: %d ns\nSelection runtime: %d ns\nInversion ratio: %d\n",
-           selectionMedian, mergesortMedian, mergesortRuntime, selectionRuntime, numInversionsBefore/numInversionsAfter);
+      return String.format(
+          "Selection median: %d\nMergesort Median: %d\nSelection runtime: %d ns\nMergesort runtime: %d ns\nInversion ratio: %f\n",
+          selectionMedian, mergesortMedian, selectionRuntime, mergesortRuntime,
+          ((double) numInversionsBefore / (double) numInversionsAfter));
     }
 
   }
 
+
   public static void main(String[] args) {
     // ArrayList to hold results of simulations for
-    List<SimulationResult> results  = new ArrayList<>();
+    List<SimulationResult> results = new ArrayList<>();
 
     // loop through simulation with different data sizes
-    for(int i = 100; i <= 100000; i = i*10) {
+    for (int i = 100; i <= 100000; i = i * 10) {
       final int[] data = DataUtils.generateData(i, 1000000);
       final int[] dataClone = data.clone();
 
@@ -49,7 +57,7 @@ public class Driver {
 
       // the merge sort will simultaneously calculate the number of inversions
       long numInversionsBefore = Mergesort.mergesort(dataClone, 0, data.length - 1);
-      int mergesortMedian = dataClone[(data.length/2) - 1];
+      int mergesortMedian = dataClone[(data.length / 2) - 1];
 
       // end tracking runtime of mergesort
       final long mergesortRunTime = System.nanoTime() - mergesortStartTime;
@@ -63,14 +71,15 @@ public class Driver {
 
       // run mergesort on the resulting selection/parition array to get the number of inversions
       // still remaining after finding the lower median
-      long numInversionsAfter = Mergesort.mergesort(data, 0 , data.length - 1 );
+      long numInversionsAfter = Mergesort.mergesort(data, 0, data.length - 1);
 
       // store the result
-      results.add(new SimulationResult(selectionMedian, mergesortMedian, numInversionsBefore, numInversionsAfter, mergesortRunTime, selectionRuntime));
+      results.add(new SimulationResult(selectionMedian, mergesortMedian, selectionRuntime,
+          mergesortRunTime, numInversionsBefore, numInversionsAfter));
     }
 
-    for(SimulationResult simResult : results) {
-      System.out.println(simResult.toString());
+    for(SimulationResult result : results) {
+      System.out.println(result.toString());
     }
 
   }
